@@ -64,6 +64,14 @@ module.exports = function(grunt) {
                 files: ['sass/*.scss'],
                 tasks: ['sass']
             }
+        },
+
+        uncss: {
+            dist: {
+                files: {
+                    'css/bootstrap.min.css': 'app/index.html'
+                }
+            }
         }
 
 
@@ -74,7 +82,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-uncss');
 
-    grunt.registerTask('dev',['concat','uglify','cssmin','sass','watch']);
+    grunt.registerTask('dev',['uncss','concat','uglify','cssmin','sass','watch']);
 
 };
