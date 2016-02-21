@@ -2,7 +2,8 @@
 module.exports = function(grunt) {
     var config = {
         sourceJS: 'source/js',
-        sourceCSS: 'source/css'
+        sourceCSS: 'source/css',
+        sourceSASS: 'source/sass'
     };
 
     grunt.initConfig({
@@ -48,14 +49,32 @@ module.exports = function(grunt) {
                 src : ['css/base.css', 'css/bootstrap.min.css', 'css/bootstrap-grunt theme.min.css'],
                 dest: '<%= config.sourceCSS %>/base.css'
             }
+        },
+
+        sass: {
+            dist: {
+                files: {
+                    '<%= config.sourceSASS %>/sass-test.css': 'sass/test.scss'
+                }
+            }
+        },
+
+        watch: {
+            sass: {
+                files: ['sass/*.scss'],
+                tasks: ['sass']
+            }
         }
+
 
     });
 
+    grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-watch');
 
-    grunt.registerTask('dev',['concat','uglify','cssmin']);
+    grunt.registerTask('dev',['concat','uglify','cssmin','sass','watch']);
 
 };
