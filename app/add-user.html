@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+<html lang="en" ng-app="addUserApp">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Angular Project</title>
+    <script src="../js/lib/jquery.min.js"></script>
+    <script src="../js/lib/angular.min.js"></script>
+    <script src="../js/lib/angular-messages.js"></script>
+    <!-- Firebase -->
+    <script src="../js/lib/firebase.js"></script>
+    <!-- AngularFire -->
+    <script src="../js/lib/angularfire.min.js"></script>
+    <script src="../js/app/app-add-user.js"></script>
+    <script src="../js/lib/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/bootstrap-theme.min.css">
+</head>
+
+<body role="document"  ng-controller="addUserCtrl">
+
+<!-- Fixed navbar -->
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Angular Project</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="index.html">Users</a></li>
+                <li class="active"><a href="add-user.html">Add User</a></li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>
+
+<div class="container theme-showcase" role="main">
+    <div class="col-md-6">
+        <div class="page-header" style="margin-top: 70px;">
+            <h1>Add User</h1>
+        </div>
+        <form name="addUserForm" id="addUserForm" novalidate class="form" role="form" ng-submit="submitForm()">
+            <div class="row show-grid">
+                <div class="col-xs-6" ng-class="{'has-error': addUserForm.userId.$touched  && addUserForm.userId.$invalid, 'has-success': addUserForm.userId.$touched  && addUserForm.userId.$valid}">
+                    <label class="control-label">User Id</label>
+                    <input type="text" ngPattern="^[0-9]" ng-model="addUserCtrl.addUserForm.userId" name="userId" required="true" placeholder="User Id" class="form-control" maxlength="10" ng-minlength="2" ng-maxlength="5">
+                    <div class="form-group" ng-messages="addUserForm.userId.$dirty && addUserForm.userId.$error">
+                        <p ng-message="required" class="control-label">Please Enter Id</p>
+                        <p ng-message="minlength" class="control-label">It must more than 2 characters</p>
+                        <p ng-message="maxlength" class="control-label">It must less than 5 characters</p>
+                        <p ng-message="number" class="control-label">It must be a number</p>
+                    </div>
+                    <!--
+                    <div class="form-group has-error" ng-show="addUserForm.userId.$dirty addUserForm.userId.$error.number">
+                        <p class="control-label">Not valid number!</P>
+                    </div>-->
+                </div>
+                <div class="col-xs-6" ng-class="{'has-error': addUserForm.userName.$touched  && addUserForm.userName.$invalid, 'has-success': addUserForm.userName.$touched  && addUserForm.userName.$valid}">
+                    <label class="control-label">User Name</label>
+                    <input type="text" ng-model="addUserCtrl.addUserForm.userName " name="userName" required="true" ng-maxlength="50" maxlength="50" placeholder="User Name" class="form-control">
+                    <div ng-show="addUserForm.userName.$dirty && addUserForm.userName.$invalid">
+                        <p class="control-label">Please Enter Name</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row show-grid">
+                <div class="col-xs-6" ng-class="{'has-error': addUserForm.userPhone.$touched  && addUserForm.userPhone.$invalid, 'has-success': addUserForm.userPhone.$touched  && addUserForm.userPhone.$valid}">
+                    <label class="control-label">User Phone</label>
+                    <input type="text" ng-model="addUserCtrl.addUserForm.userPhone" name="userPhone" required="true" placeholder="User Phone" class="form-control" maxlength="11" minlength="10" ng-minlength="10"  ng-manlength="11">
+                    <div ng-show="addUserForm.userPhone.$dirty && addUserForm.userPhone.$invalid">
+                        <p class="control-label">Please Enter a phone</p>
+                    </div>
+                </div>
+                <div class="col-xs-6" ng-class="{'has-error': addUserForm.userEmail.$touched  && addUserForm.userEmail.$invalid, 'has-success': addUserForm.userEmail.$touched  && addUserForm.userEmail.$valid}">
+                    <label class="control-label">User E-mail</label>
+                    <input type="text" ng-model="addUserCtrl.addUserForm.userEmail" name="userEmail" required="true" placeholder="User E-mail" class="form-control" ng-pattern='/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/'>
+                    <div ng-show="addUserForm.userEmail.$dirty && addUserForm.userEmail.$invalid">
+                        <p class="control-label">Please Enter a e-mail</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row show-grid">
+                <div class="col-xs-6" ng-class="{'has-error': addUserForm.userNickName.$touched  && addUserForm.userNickName.$invalid, 'has-success': addUserForm.userNickName.$touched  && addUserForm.userNickName.$valid}">
+                    <label class="control-label">Nick Name</label>
+                    <input type="text" ng-model="addUserCtrl.addUserForm.userNickName" name="userNickName" required="true" placeholder="Nick Name" class="form-control" maxlength="15">
+                    <div ng-show="addUserForm.userNickName.$dirty && addUserForm.userNickName.$invalid">
+                        <p class="control-label">Please Enter a nick name</p>
+                    </div>
+                </div>
+                <div class="col-xs-6" ng-class="{'has-error': addUserForm.userWebSite.$touched  && addUserForm.userWebSite.$invalid, 'has-success': addUserForm.userWebSite.$touched  && addUserForm.userWebSite.$valid}">
+                    <label class="control-label">Web Site</label>
+                    <input type="text" ng-model="addUserCtrl.addUserForm.userWebSite" name="userWebSite" required="true" placeholder="Web Site" class="form-control" maxlength="50" ng-pattern='/^(http\:\/\/[a-zA-Z0-9_\-]+(?:\.[a-zA-Z0-9_\-]+)*\.[a-zA-Z]{2,4}(?:\/[a-zA-Z0-9_]+)*(?:\/[a-zA-Z0-9_]+\.[a-zA-Z]{2,4}(?:\?[a-zA-Z0-9_]+\=[a-zA-Z0-9_]+)?)?(?:\&[a-zA-Z0-9_]+\=[a-zA-Z0-9_]+)*)$/
+'>
+                    <div ng-show="addUserForm.userWebSite.$dirty && addUserForm.userWebSite.$invalid">
+                        <p class="control-label">Please Enter a web site name</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-header">
+                <h4>Adddress Info</h4>
+            </div>
+
+            <div class="row show-grid">
+                <div class="col-xs-6"><input type="text" name="city" ng-model="addUserForm.addUserForm.city" placeholder="City" class="form-control"></div>
+                <div class="col-xs-6"><input type="text" name="street" ng-model="addUserForm.addUserForm.street" placeholder="Street" class="form-control"></div>
+            </div>
+
+            <div class="row show-grid">
+                <div class="col-xs-6"><input type="text" name="suite" ng-model="addUserForm.addUserForm.suite" placeholder="Suite" class="form-control"></div>
+                <div class="col-xs-6"><input type="text" name="zipCode" ng-model="addUserForm.addUserForm.zipCode" placeholder="Zip Code" class="form-control"></div>
+            </div>
+
+            <div class="row show-grid">
+                <div class="col-xs-6">
+                    <input type="submit" ng-disabled="addUserForm.$invalid" class="btn btn-success" value="Add User" />
+                </div>
+            </div>
+
+        </form>
+
+        <div ng-show="showAdded" class="alert alert-success" role="alert">
+            <strong>Well done!</strong> You successfully added the user
+        </div>
+
+    </div>
+    <div class="col-md-6">
+        <div class="page-header" style="margin-top: 70px;">
+            <h1>Users List</h1>
+        </div>
+        <table class="table table-bordered table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Nick Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="user in usersList">
+                    <td>
+                        <span>{{ user.id }}</span>
+                    </td>
+                    <td>
+                        <span>{{ user.name }}</span>
+                    </td>
+                    <td>
+                        <span>{{ user.username }}</span>
+                    </td>
+                    <td>
+                        <span>{{ user.phone }}</span>
+                    </td>
+                    <td>
+                        <span>{{ user.email }}</span>
+                    </td>
+                    <td>
+                        <address>Address: {{ user.address.street }}<br /> St. {{ user.address.suite }}<br /> {{ user.address.city }} </address>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- /container -->
+</body>
+</html>

@@ -1,0 +1,319 @@
+
+<!DOCTYPE html>
+<html lang="en" ng-app="userListApp">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Angular Project</title>
+    <script src="../js/lib/jquery.min.js"></script>
+    <script src="../js/lib/angular.min.js"></script>
+    <!-- Firebase -->
+    <script src="../js/lib/firebase.js"></script>
+    <!-- AngularFire -->
+    <script src="../js/lib/angularfire.min.js"></script>
+    <script src="../js/app/app-user-list.js"></script>
+    <script src="../js/lib/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/bootstrap-theme.min.css">
+</head>
+
+<body role="document" ng-controller="userListViewController">
+
+<!-- Fixed navbar -->
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Angular Project</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="index.html">Users</a></li>
+                <li><a href="add-user.html">Add User</a></li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>
+
+<div class="container theme-showcase" role="main">
+    <div style="margin: 70px 0 20px 0;">
+        <div class="page-header">
+            <h1>Search User</h1>
+        </div>
+        <form ng-submit="searchUser()" name="searchUserForm">
+            <div class="row show-grid">
+                <div class="col-xs-11">
+                    <input type="text" required="" ng-model="userName" placeholder="Search for users..." class="form-control">
+                </div>
+                <div class="col-xs-1">
+                    <button ng-disabled="searchUserForm.$invalid"  class="btn btn-info">Search</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+    <div ng-show="notFound" class="alert alert-danger" role="alert">
+        <strong>User!</strong> not found. Please try again.
+    </div>
+    <div class="page-header" style="margin-top: 20px;">
+        <h1>Add User</h1>
+    </div>
+    <form name="addUserForm" id="addUserForm" novalidate class="form" role="form"  ng-submit="submitForm()">
+        <table class="table table-bordered table-striped table-hover">
+            <tr>
+                <td ng-class="{'has-error': addUserForm.userId.$touched  && addUserForm.userId.$invalid, 'has-success': addUserForm.userId.$touched  && addUserForm.userId.$valid}">
+                    <label class="control-label">User Id</label>
+                    <input type="text" ngPattern="^[0-9]" ng-model="addUserCtrl.addUserForm.userId" name="userId" required="true" placeholder="User Id" class="form-control" maxlength="10" ng-minlength="2" ng-maxlength="5">
+                </td>
+                <td  ng-class="{'has-error': addUserForm.userName.$touched  && addUserForm.userName.$invalid, 'has-success': addUserForm.userName.$touched  && addUserForm.userName.$valid}">
+                    <label class="control-label">User Name</label>
+                    <input type="text" ng-model="addUserCtrl.addUserForm.userName " name="userName" required="true" ng-maxlength="50" maxlength="50" placeholder="User Name" class="form-control">
+                </td>
+                <td ng-class="{'has-error': addUserForm.userPhone.$touched  && addUserForm.userPhone.$invalid, 'has-success': addUserForm.userPhone.$touched  && addUserForm.userPhone.$valid}">
+                    <label class="control-label">User Phone</label>
+                    <input type="text" ng-model="addUserCtrl.addUserForm.userPhone" name="userPhone" required="true" placeholder="User Phone" class="form-control" maxlength="11" minlength="10" ng-minlength="10"  ng-manlength="11">
+                </td>
+                <td ng-class="{'has-error': addUserForm.userEmail.$touched  && addUserForm.userEmail.$invalid, 'has-success': addUserForm.userEmail.$touched  && addUserForm.userEmail.$valid}">
+                    <label class="control-label">User e-mail</label>
+                    <input type="text"  ng-model="addUserCtrl.addUserForm.userEmail" name="userEmail" required="true" placeholder="User E-mail" class="form-control" ng-pattern='/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/'>
+                </td>
+                <td valign="center">
+                    <input type="submit" ng-disabled="addUserForm.$invalid" class="btn btn-success" value="Add User" style="margin-top:25px;" />
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <div ng-show="showAdded" class="alert alert-success" role="alert">
+        <strong>Well done!</strong> You successfully added the user;
+    </div>
+
+    <div class="page-header" style="margin-top: 70px;">
+        <h1>Users List</h1>
+    </div>
+    <table ng-hide="userEmpty" class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Nick Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="user in usersList">
+                <td>
+                    <span ng-hide="showEdit{{ user.id }}">{{ user.id }}</span>
+                    <input ng-show="showEdit{{ user.id }}" ng-model="user.id" type="text" value="{{ user.id }}" placeholder="User Id" class="form-control">
+                </td>
+                <td>
+                    <span ng-hide="showEdit{{ user.id }}">{{ user.name }}</span>
+                    <input ng-show="showEdit{{ user.id }}" ng-model="user.name" type="text" value="{{ user.name }}" placeholder="User Name" class="form-control">
+                </td>
+                <td>
+                    <span ng-hide="showEdit{{ user.id }}">{{ user.username }}</span>
+                    <input ng-show="showEdit{{ user.id }}" ng-model="user.username" type="text" value="{{ user.username }}" placeholder="Nick Name" class="form-control">
+                </td>
+                <td>
+                    <span ng-hide="showEdit{{ user.id }}">{{ user.phone }}</span>
+                    <input ng-show="showEdit{{ user.id }}" ng-model="user.phone" type="text" value="{{ user.phone }}" placeholder="User Phone" class="form-control">
+                </td>
+                <td>
+                    <span ng-hide="showEdit{{ user.id }}">{{ user.email }}</span>
+                    <input ng-show="showEdit{{ user.id }}" ng-model="user.email" type="text" value="{{ user.email }}" placeholder="User E-mail" class="form-control">
+                </td>
+                <td>
+                    <button type="button" ng-hide="showEdit{{ user.id }}" class="btn btn-primary" ng-click="editUser(user)">Edit</button>
+                    <button type="button" ng-hide="showEdit{{ user.id }}" class="btn btn-danger" ng-click="deleteUser(user.$id)">Delete</button>
+
+                    <button type="button" ng-show="showEdit{{ user.id }}" class="btn btn-warning" ng-click="saveUser(user)">Save</button>
+                    <button type="button" ng-show="showEdit{{ user.id }}" class="btn btn-danger" ng-click="cancelEdit(user)">Cancel</button>
+                </td>
+                <!--<td><address>Address: {{ user.address.street }}<br /> St. {{ user.address.suite }}<br /> {{ user.address.city }} </address></td>-->
+            </tr>
+        </tbody>
+    </table>
+    <div ng-show="userEmpty" class="alert alert-danger" role="alert">
+        <strong>Users List!</strong> not found.
+    </div>
+
+
+
+<div  ng-hide="true">
+<div class="page-header">
+    <h1>Buttons</h1>
+</div>
+<p>
+    <button type="button" class="btn btn-lg btn-default">Default</button>
+    <button type="button" class="btn btn-lg btn-primary">Primary</button>
+    <button type="button" class="btn btn-lg btn-success">Success</button>
+    <button type="button" class="btn btn-lg btn-info">Info</button>
+    <button type="button" class="btn btn-lg btn-warning">Warning</button>
+    <button type="button" class="btn btn-lg btn-danger">Danger</button>
+    <button type="button" class="btn btn-lg btn-link">Link</button>
+</p>
+<p>
+    <button type="button" class="btn btn-default">Default</button>
+    <button type="button" class="btn btn-primary">Primary</button>
+    <button type="button" class="btn btn-success">Success</button>
+    <button type="button" class="btn btn-info">Info</button>
+    <button type="button" class="btn btn-warning">Warning</button>
+    <button type="button" class="btn btn-danger">Danger</button>
+    <button type="button" class="btn btn-link">Link</button>
+</p>
+<p>
+    <button type="button" class="btn btn-sm btn-default">Default</button>
+    <button type="button" class="btn btn-sm btn-primary">Primary</button>
+    <button type="button" class="btn btn-sm btn-success">Success</button>
+    <button type="button" class="btn btn-sm btn-info">Info</button>
+    <button type="button" class="btn btn-sm btn-warning">Warning</button>
+    <button type="button" class="btn btn-sm btn-danger">Danger</button>
+    <button type="button" class="btn btn-sm btn-link">Link</button>
+</p>
+<p>
+    <button type="button" class="btn btn-xs btn-default">Default</button>
+    <button type="button" class="btn btn-xs btn-primary">Primary</button>
+    <button type="button" class="btn btn-xs btn-success">Success</button>
+    <button type="button" class="btn btn-xs btn-info">Info</button>
+    <button type="button" class="btn btn-xs btn-warning">Warning</button>
+    <button type="button" class="btn btn-xs btn-danger">Danger</button>
+    <button type="button" class="btn btn-xs btn-link">Link</button>
+</p>
+
+
+<div class="page-header">
+    <h1>Alerts</h1>
+</div>
+<div class="alert alert-success" role="alert">
+    <strong>Well done!</strong> You successfully read this important alert message.
+</div>
+<div class="alert alert-info" role="alert">
+    <strong>Heads up!</strong> This alert needs your attention, but it's not super important.
+</div>
+<div class="alert alert-warning" role="alert">
+    <strong>Warning!</strong> Best check yo self, you're not looking too good.
+</div>
+<div class="alert alert-danger" role="alert">
+    <strong>Oh snap!</strong> Change a few things up and try submitting again.
+</div>
+
+
+
+<div class="page-header">
+    <h1>List groups</h1>
+</div>
+<div class="row">
+    <div class="col-sm-4">
+        <ul class="list-group">
+            <li class="list-group-item">Cras justo odio</li>
+            <li class="list-group-item">Dapibus ac facilisis in</li>
+            <li class="list-group-item">Morbi leo risus</li>
+            <li class="list-group-item">Porta ac consectetur ac</li>
+            <li class="list-group-item">Vestibulum at eros</li>
+        </ul>
+    </div><!-- /.col-sm-4 -->
+    <div class="col-sm-4">
+        <div class="list-group">
+            <a href="#" class="list-group-item active">
+                Cras justo odio
+            </a>
+            <a href="#" class="list-group-item">Dapibus ac facilisis in</a>
+            <a href="#" class="list-group-item">Morbi leo risus</a>
+            <a href="#" class="list-group-item">Porta ac consectetur ac</a>
+            <a href="#" class="list-group-item">Vestibulum at eros</a>
+        </div>
+    </div><!-- /.col-sm-4 -->
+    <div class="col-sm-4">
+        <div class="list-group">
+            <a href="#" class="list-group-item active">
+                <h4 class="list-group-item-heading">List group item heading</h4>
+                <p class="list-group-item-text">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
+            </a>
+            <a href="#" class="list-group-item">
+                <h4 class="list-group-item-heading">List group item heading</h4>
+                <p class="list-group-item-text">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
+            </a>
+            <a href="#" class="list-group-item">
+                <h4 class="list-group-item-heading">List group item heading</h4>
+                <p class="list-group-item-text">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
+            </a>
+        </div>
+    </div><!-- /.col-sm-4 -->
+</div>
+
+
+<div class="page-header">
+    <h1>Panels</h1>
+</div>
+<div class="row">
+    <div class="col-sm-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Panel title</h3>
+            </div>
+            <div class="panel-body">
+                Panel content
+            </div>
+        </div>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Panel title</h3>
+            </div>
+            <div class="panel-body">
+                Panel content
+            </div>
+        </div>
+    </div><!-- /.col-sm-4 -->
+    <div class="col-sm-4">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h3 class="panel-title">Panel title</h3>
+            </div>
+            <div class="panel-body">
+                Panel content
+            </div>
+        </div>
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Panel title</h3>
+            </div>
+            <div class="panel-body">
+                Panel content
+            </div>
+        </div>
+    </div><!-- /.col-sm-4 -->
+    <div class="col-sm-4">
+        <div class="panel panel-warning">
+            <div class="panel-heading">
+                <h3 class="panel-title">Panel title</h3>
+            </div>
+            <div class="panel-body">
+                Panel content
+            </div>
+        </div>
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <h3 class="panel-title">Panel title</h3>
+            </div>
+            <div class="panel-body">
+                Panel content
+            </div>
+        </div>
+    </div><!-- /.col-sm-4 -->
+</div>
+</div>
+
+
+
+</div>
+<!-- /container -->
+</body>
+</html>
