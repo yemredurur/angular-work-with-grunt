@@ -10,6 +10,22 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
         config: config,
 
+        notify: {
+            options: {
+                enabled: true,
+                max_jshint_notifications: 5,
+                title: " <%= pkg.name %> - v<% pkg.version %>",
+                success: false,
+                duration: 3
+            },
+            sass: {
+                options: {
+                    title: 'Sass task has an error',
+                    message: 'Please check the sass options'
+                }
+            }
+        },
+
         cssmin: {
             my_target: {
                 options: {
@@ -77,12 +93,15 @@ module.exports = function(grunt) {
 
     });
 
+    grunt.loadNpmTasks('grunt-notify');
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-uncss');
+
+    grunt.task.run('notify');
 
     grunt.registerTask('dev',['uncss','concat','uglify','cssmin','sass','watch']);
 
