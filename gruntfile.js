@@ -11,17 +11,27 @@ module.exports = function(grunt) {
         config: config,
 
         notify: {
-            options: {
-                enabled: true,
-                max_jshint_notifications: 5,
-                title: " <%= pkg.name %> - v<% pkg.version %>",
-                success: false,
-                duration: 3
+
+            custom:{
+                options:{
+                    enabled:true,
+                    title: '<%= pkg.name %> - v<% pkg.version %>',
+                    message:'Start',
+                    max_jshint_notifications: 5,
+                    success: false,
+                    duration: 3
+                }
             },
             sass: {
                 options: {
-                    title: 'Sass task has an error',
-                    message: 'Please check the sass options'
+                    title: 'Sass task started',
+                    message: 'Sass task running'
+                }
+            },
+            cssmin: {
+                options: {
+                    title: 'Cssmin task started',
+                    message: 'Cssmin task running'
                 }
             }
         },
@@ -70,7 +80,7 @@ module.exports = function(grunt) {
         sass: {
             dist: {
                 files: {
-                    '<%= config.sourceSASS %>/sass-test.css': 'sass/test.scss'
+                    '<%= config.sourceSASS %>/sass-test.css': 'sass/test1.scss'
                 }
             }
         },
@@ -101,8 +111,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-uncss');
 
-    grunt.task.run('notify');
-
     grunt.registerTask('dev',['uncss','concat','uglify','cssmin','sass','watch']);
+
+    grunt.task.run('notify');
 
 };
