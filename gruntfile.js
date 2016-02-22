@@ -24,13 +24,13 @@ module.exports = function(grunt) {
             },
             sass: {
                 options: {
-                    title: 'Sass task started',
+                    title: '<%= pkg.name %> - v<% pkg.version %>',
                     message: 'Sass task running'
                 }
             },
             cssmin: {
                 options: {
-                    title: 'Cssmin task started',
+                    title: '<%= pkg.name %> - v<% pkg.version %>',
                     message: 'Cssmin task running'
                 }
             }
