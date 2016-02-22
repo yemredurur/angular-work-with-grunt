@@ -1,6 +1,7 @@
 
 module.exports = function(grunt) {
     var config = {
+        app: 'app',
         sourceJS: 'source/js',
         sourceCSS: 'source/css',
         sourceSASS: 'source/sass'
@@ -80,7 +81,7 @@ module.exports = function(grunt) {
         sass: {
             dist: {
                 files: {
-                    '<%= config.sourceSASS %>/sass-test.css': 'sass/test1.scss'
+                    '<%= config.sourceSASS %>/sass-test.css': 'sass/test.scss'
                 }
             }
         },
@@ -95,10 +96,23 @@ module.exports = function(grunt) {
         uncss: {
             dist: {
                 files: {
-                    'css/bootstrap.min.css': 'app/index.html'
+                    '<%= config.sourceCSS %>/*.css': 'app/index.html'
                 }
             }
-        }
+        },
+
+        injector: {
+            options: {
+                addRootSlash: '../',
+                ignorePath:'<%= config.app %>/'
+            },
+            local_dependencies: {
+                files: {
+                    '<%= config.app %>/index.html': ['<%= config.sourceJS %>/*.js', '<%= config.sourceCSS %>/*.css'],
+                    '<%= config.app %>/add-user.html': ['<%= config.sourceJS %>/*.js', '<%= config.sourceCSS %>/*.css']
+                }
+            }
+        },
 
 
     });
@@ -110,8 +124,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-uncss');
+    grunt.loadNpmTasks('grunt-injector');
 
-    grunt.registerTask('dev',['uncss','concat','uglify','cssmin','sass','watch']);
+    grunt.registerTask('dev',['concat','uglify','cssmin','sass','injector','uncss','watch']);
 
     grunt.task.run('notify');
 
