@@ -2,9 +2,10 @@
 module.exports = function(grunt) {
     var config = {
         app: 'app',
-        sourceJS: 'source/js',
-        sourceCSS: 'source/css',
-        sourceSASS: 'source/sass'
+        source: 'source/app/',
+        sourceJS: 'source/app/js',
+        sourceCSS: 'source/app/css',
+        sourceSASS: 'source/app/sass'
     };
 
     grunt.initConfig({
@@ -104,15 +105,44 @@ module.exports = function(grunt) {
         injector: {
             options: {
                 addRootSlash: '../',
-                ignorePath:'<%= config.app %>/'
+                ignorePath:'',
+                template: '<%= config.source %>',
+                templateString: '<%= config.source %>'
             },
             local_dependencies: {
                 files: {
-                    '<%= config.app %>/index.html': ['<%= config.sourceJS %>/*.js', '<%= config.sourceCSS %>/*.css'],
-                    '<%= config.app %>/add-user.html': ['<%= config.sourceJS %>/*.js', '<%= config.sourceCSS %>/*.css']
+                    '<%= config.source %>/*': ['<%= config.sourceJS %>/*.js', '<%= config.sourceCSS %>/*.css']
                 }
             }
         },
+
+        browserSync: {
+            dev: {
+                bsFiles: {
+                    src : [
+                        '<%= config.sourceCSS %>/*.css',
+                        '<%= config.sourceJS %>/*.js',
+                        '<%= config.source %>/app/*.html'
+                    ]
+                },
+                options: {
+                    watchTask: true,
+                    server: './<%= config.source %>'
+                }
+            }
+        },
+
+        copy: {
+            /*html: {
+                src: '<%= config.app %>/*.html',
+                dest: '<%= config.source %>/index.html'
+            },*/
+            main: {
+                files: [
+                    {expand: true, src: ['<%= config.app %>/*'], dest: 'source/', filter: 'isFile'},
+                ]
+            }
+        }
 
 
     });
@@ -125,8 +155,11 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-uncss');
     grunt.loadNpmTasks('grunt-injector');
+    grunt.loadNpmTasks('grunt-browser-sync');
+    grunt.loadNpmTasks('grunt-contrib-copy');
 
-    grunt.registerTask('dev',['concat','uglify','cssmin','sass','injector','uncss','watch']);
+
+    grunt.registerTask('dev',['concat','uglify','cssmin','sass','copy:main','injector','browserSync','watch']);
 
     grunt.task.run('notify');
 
