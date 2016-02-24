@@ -2,6 +2,7 @@
 module.exports = function(grunt) {
     var config = {
         app: 'app',
+        sourceBase: '/source/',
         source: 'source/app/',
         sourceJS: 'source/app/js',
         sourceCSS: 'source/app/css',
@@ -104,8 +105,8 @@ module.exports = function(grunt) {
 
         injector: {
             options: {
-                addRootSlash: '../',
-                ignorePath:'',
+                addRootSlash: false,
+                ignorePath:'<%= config.sourceBase %>',
                 template: '<%= config.source %>',
                 templateString: '<%= config.source %>'
             },
