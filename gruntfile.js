@@ -32,7 +32,7 @@ module.exports = function(grunt) {
             },
             my_target: {
                 files: {
-                    '<%= config.sourceJS %>/test.min.js': ['js/app/app-add-user.js','js/app/app-user-list.js'],
+                    '<%= config.sourceJS %>/app.min.js': ['js/app/app-add-user.js','js/app/app-user-list.js'],
                     '<%= config.sourceJS %>/lib.min.js': ['js/lib/jquery.min.js','js/lib/angular.min.js','js/lib/angular-messages.js','js/lib/firebase.js','js/lib/angularfire.min.js','js/lib/bootstrap.min.js']
                 }
             }
@@ -68,7 +68,7 @@ module.exports = function(grunt) {
              },*/
             main: {
                 files: [
-                    {expand: true, src: ['<%= config.app %>/*'], dest: 'source/', filter: 'isFile'}
+                    {expand: true, src: ['<%= config.app %>/*.html'], dest: 'source/', filter: 'isFile'}
                 ]
             }
         },
@@ -76,13 +76,14 @@ module.exports = function(grunt) {
         injector: {
             options: {
                 addRootSlash: false,
-                ignorePath:'<%= config.sourceBase %>',
-                template: '<%= config.app %>/index.html'
+                ignorePath:'<%= config.source %>',
+                template: '<%= config.source %>index.html'
             },
             local_dependencies: {
-                files: {
-                    '<%= config.source %>/*': ['<%= config.sourceJS %>/*.js', '<%= config.sourceCSS %>/*.css']
-                }
+                files: [
+                    {'<%= config.source %>index.html': ['<%= config.sourceJS %>/*.js', '<%= config.sourceCSS %>/*.css']},
+                    {'<%= config.source %>add-user.html': ['<%= config.sourceJS %>/*.js', '<%= config.sourceCSS %>/*.css']}
+                ]
             }
         },
 
@@ -159,7 +160,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
 
 
-    grunt.registerTask('dev',['concat','uglify','cssmin','injector','sass','copy:main','browserSync','watch']);
+    grunt.registerTask('buildDev',['concat','uglify','cssmin','copy:main','injector','sass','browserSync','watch:dev']);
 
     grunt.task.run('notify');
 
