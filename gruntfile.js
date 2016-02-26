@@ -80,10 +80,10 @@ module.exports = function(grunt) {
                 template: '<%= config.source %>index.html'
             },
             local_dependencies: {
-                files: [
-                    {'<%= config.source %>index.html': ['<%= config.sourceJS %>/*.js', '<%= config.sourceCSS %>/*.css']},
-                    {'<%= config.source %>add-user.html': ['<%= config.sourceJS %>/*.js', '<%= config.sourceCSS %>/*.css']}
-                ]
+                files: {
+                    '<%= config.source %>index.html': ['<%= config.sourceJS %>/*.js', '<%= config.sourceCSS %>/*.css'],
+                    '<%= config.source %>add-user.html': ['<%= config.sourceJS %>/*.js', '<%= config.sourceCSS %>/*.css']
+                }
             }
         },
 
@@ -108,8 +108,8 @@ module.exports = function(grunt) {
                 livereload: true
             },
             dev:{
-                files: ['sass/*.scss','/js/*.js','/css/*.css','<%= config.app %>/*.html'],
-                tasks: ['uglify','cssmin','copy:main','injector']
+                files: ['sass/*.scss','<%= config.sourceJS %>/*.js','<%= config.sourceCSS %>/*.css','<%= config.source %>/*.html'],
+                tasks: ['concat','uglify','cssmin','copy:main','injector']
             }
         },
 

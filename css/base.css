@@ -4,3 +4,5 @@
 input.ng-touched.ng-invalid {
     border: 1px solid red;
 }
+
+body { background: #0000AA;}
